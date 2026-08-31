@@ -612,10 +612,20 @@ async fn req_info(req: Request, addr: SocketAddr) -> Result<Info, Response> {
         {
             continue;
         }
-        hmap.insert(
-            title_case(name.as_str()),
-            s(String::from_utf8_lossy(value.as_bytes())),
-        );
+        // WSGI servers join duplicate header lines with a comma.
+        let key = title_case(name.as_str());
+        let val = String::from_utf8_lossy(value.as_bytes()).into_owned();
+        match hmap.entry(key) {
+            Entry::Vacant(e) => {
+                e.insert(s(val));
+            }
+            Entry::Occupied(mut e) => {
+                if let Value::String(prev) = e.get_mut() {
+                    prev.push(',');
+                    prev.push_str(&val);
+                }
+            }
+        }
     }
     let headers_v = Value::Object(hmap);
 

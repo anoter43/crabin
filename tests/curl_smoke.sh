@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 # Curl smoke tests against a running server. Usage: BASE=http://127.0.0.1:5000 ./tests/curl_smoke.sh
 BASE="${BASE:-http://127.0.0.1:5000}"
 fail=0
